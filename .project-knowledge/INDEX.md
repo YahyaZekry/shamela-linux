@@ -1,17 +1,20 @@
 # Shamela Linux Restoration — Knowledge Index
 
-> Last updated: 2026-08-14 (artifacts persisted; DB-mount goal set)
+> Last updated: 2026-08-18 (migration complete; post-migration polish)
 > Status: Active
-> Stack: Python 3.7 (CPython 3.7.12) · PyInstaller-frozen · Qt widgets · xdis 6.0.5 / uncompyle6 3.9.0
-> Current goal: Mount the user's existing Windows Shamela database in the restored Linux build
+> Stack: Python 3.7 (CPython 3.7.12) · PyInstaller-frozen · Qt widgets · Lucene 10.4 · xdis 6.0.5 / uncompyle6 3.9.0
+> Current goal: Post-migration polish (alphas, bibliography search, live-app verification)
 
 ## What This Project Does
 
 Reverse-engineers the Shamela Library Linux desktop app (v1448.2, a PyInstaller-frozen
-Python 3.7.12 Qt application) into clean, editable Python source. The acceptance bar is
-byte-exactness: each reconstructed function must compile to bytecode (`co_code`) identical
-to the original `.pyc`, using xdis/uncompyle6 and manual disassembly reconstruction where the
-decompiler fails.
+Python 3.7.12 Qt application) into clean, editable Python source, and migrates the legacy
+Golden Shamela library (29,278 books) into the modern Linux app.
+
+The decompilation acceptance bar is byte-exactness: each reconstructed function must compile
+to bytecode (`co_code`) identical to the original `.pyc`. The migration tool (`tools/migrate_full.py`)
+converts the entire Golden library: title-matching, catalog insertion, and per-book SQLite + Lucene
+indexing.
 
 ---
 

@@ -18,7 +18,7 @@
 - `_buildHtmlFromParagraphs` (customs.py, ×2 occurrences) — decompiler emitted a broken 4-quote triple-quoted f-string (`f"""font-family:"{run['font']}"""`) that was a `SyntaxError`; consts (`'font-family:"'`, `'"'`) showed the original was `f'font-family:"{run["font"]}"'` → fixed *(fixed: 2026-08-14)*
 - `realResolutions_new` (customs.py) — `SETUP_LOOP`/`SETUP_EXCEPT` label collision; per-monitor DPI function rebuilt from disassembly incl. docstring → bytecode IDENTICAL *(fixed: 2026-08-14)*
 - `ReadersBrowser.keyPressEvent` (customs.py) — biggest failure; rebuilt from full disassembly incl. `wrapped=False` kwarg form (verified how 3.7 compiles `matchesShortcutEvent(event, 'Ctrl+Up', wrapped=False)`) and the `Qt.Key_F1 <= key <= Qt.Key_F35` chained comparison with its duplicated `Qt.Key_End` set member → bytecode IDENTICAL *(fixed: 2026-08-14)*
-- Artifact-loss risk — `d3/`, `decompiled/`, and `shamela-extract/` (289 pyc) copied from `/tmp/opencode` into the repo; verified copy integrity (d3 parses, subdirs intact). Was a Roadmap Known Bug → resolved. *(fixed: 2026-08-14)*
+- `tools/migrate_full.py` catalog phase wrote the golden author **name** into `book.authors` (`'محمد رشيد رضا'`, `'-'`, or empty), but the app's `fillBookCache` expects comma-separated numeric author **ids** and crashes with `ValueError: invalid literal for int()`. Result: blank, unclickable rows for all 22,598 migrated books. Fixed: `authors = str(aid)` in the tool; live data backfilled to `main_author` *(fixed: 2026-08-19)*
 
 ---
 
@@ -29,3 +29,5 @@
 - **Verify compiler behavior empirically** — before trusting a decompiler's guess about a construct, compile the candidate source with the real Py3.7 and compare bytecode (`dis.dis` probe). This is how `wrapped=False` was confirmed over the decompiler's `CALL_FUNCTION_KW` display. *(2026-08-14)*
 - **Reproduce literals faithfully, even odd ones** — the duplicated `Qt.Key_End` inside the set literal in `keyPressEvent` is kept as-is (a set makes it harmless, and fidelity beats tidiness). *(2026-08-14)*
 - **d3 is the clean working tree** — edits happen in `d3/`; `decompiled/` stays untouched as the decompiler baseline. *(2026-08-14)*
+- **Migration uses InsertBook fast-path** — the converter uses `addDocument` after `Importer.deleteBooks` rather than the full `engine.Book.updatePage/updateTitle` flow (which requires a per-doc searcher lease). This is safe because the full run processes each book exactly once. Batched commits every 20 books keep the index consistent. *(2026-08-14)*
+- **Resumability via progress.db** — the converter marks each golden_id as done in `tools/data/progress.db` only after a successful Lucene commit batch, so a crash loses at most one batch of work (20 books). No-pages books are marked done with count 0 (not retried). *(2026-08-14)*

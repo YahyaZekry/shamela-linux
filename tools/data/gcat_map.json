@@ -1,0 +1,303 @@
+{
+"243": {
+"mcat": 19,
+"conf": 1.0,
+"n": 303,
+"total": 449,
+"manual": true
+},
+"5": {
+"mcat": 6,
+"conf": 0.99,
+"n": 528,
+"total": 533,
+"manual": false
+},
+"31": {
+"mcat": 32,
+"conf": 0.88,
+"n": 369,
+"total": 419,
+"manual": false
+},
+"1": {
+"mcat": 1,
+"conf": 0.93,
+"n": 588,
+"total": 630,
+"manual": false
+},
+"36": {
+"mcat": 39,
+"conf": 0.98,
+"n": 320,
+"total": 328,
+"manual": false
+},
+"257": {
+"mcat": 6,
+"conf": 1.0,
+"n": 181,
+"total": 181,
+"manual": false
+},
+"30": {
+"mcat": 31,
+"conf": 0.99,
+"n": 175,
+"total": 177,
+"manual": false
+},
+"85": {
+"mcat": 23,
+"conf": 1.0,
+"n": 2,
+"total": 4,
+"manual": true
+},
+"26": {
+"mcat": 26,
+"conf": 0.99,
+"n": 380,
+"total": 383,
+"manual": false
+},
+"25": {
+"mcat": 25,
+"conf": 0.99,
+"n": 155,
+"total": 157,
+"manual": false
+},
+"38": {
+"mcat": 40,
+"conf": 1.0,
+"n": 23,
+"total": 44,
+"manual": true
+},
+"3": {
+"mcat": 4,
+"conf": 0.75,
+"n": 263,
+"total": 353,
+"manual": false
+},
+"29": {
+"mcat": 30,
+"conf": 0.99,
+"n": 107,
+"total": 108,
+"manual": false
+},
+"235": {
+"mcat": 23,
+"conf": 0.98,
+"n": 501,
+"total": 512,
+"manual": false
+},
+"20": {
+"mcat": 22,
+"conf": 0.78,
+"n": 51,
+"total": 65,
+"manual": false
+},
+"256": {
+"mcat": 10,
+"conf": 0.99,
+"n": 244,
+"total": 246,
+"manual": false
+},
+"10": {
+"mcat": 9,
+"conf": 0.95,
+"n": 60,
+"total": 63,
+"manual": false
+},
+"19": {
+"mcat": 20,
+"conf": 0.96,
+"n": 81,
+"total": 84,
+"manual": false
+},
+"17": {
+"mcat": 18,
+"conf": 0.69,
+"n": 56,
+"total": 81,
+"manual": false
+},
+"236": {
+"mcat": 28,
+"conf": 0.97,
+"n": 76,
+"total": 78,
+"manual": false
+},
+"259": {
+"mcat": 2,
+"conf": 0.96,
+"n": 73,
+"total": 76,
+"manual": false
+},
+"21": {
+"mcat": 1,
+"conf": 0.57,
+"n": 37,
+"total": 65,
+"manual": false
+},
+"39": {
+"mcat": 29,
+"conf": 0.89,
+"n": 63,
+"total": 71,
+"manual": false
+},
+"9": {
+"mcat": 26,
+"conf": 1.0,
+"n": 14,
+"total": 65,
+"manual": true
+},
+"14": {
+"mcat": 15,
+"conf": 0.99,
+"n": 67,
+"total": 68,
+"manual": false
+},
+"35": {
+"mcat": 36,
+"conf": 0.87,
+"n": 55,
+"total": 63,
+"manual": false
+},
+"12": {
+"mcat": 11,
+"conf": 0.84,
+"n": 176,
+"total": 209,
+"manual": false
+},
+"34": {
+"mcat": 37,
+"conf": 0.95,
+"n": 76,
+"total": 80,
+"manual": false
+},
+"8": {
+"mcat": 8,
+"conf": 0.59,
+"n": 68,
+"total": 116,
+"manual": false
+},
+"24": {
+"mcat": 24,
+"conf": 0.99,
+"n": 142,
+"total": 144,
+"manual": false
+},
+"7": {
+"mcat": 7,
+"conf": 0.96,
+"n": 175,
+"total": 183,
+"manual": false
+},
+"2": {
+"mcat": 3,
+"conf": 0.98,
+"n": 162,
+"total": 165,
+"manual": false
+},
+"27": {
+"mcat": 27,
+"conf": 1.0,
+"n": 31,
+"total": 31,
+"manual": false
+},
+"4": {
+"mcat": 6,
+"conf": 0.98,
+"n": 115,
+"total": 117,
+"manual": false
+},
+"22": {
+"mcat": 23,
+"conf": 0.4,
+"n": 2,
+"total": 5,
+"manual": false
+},
+"37": {
+"mcat": 39,
+"conf": 0.44,
+"n": 4,
+"total": 9,
+"manual": false
+},
+"16": {
+"mcat": 17,
+"conf": 0.97,
+"n": 67,
+"total": 69,
+"manual": false
+},
+"6": {
+"mcat": 6,
+"conf": 1.0,
+"n": 58,
+"total": 58,
+"manual": false
+},
+"262": {
+"mcat": 5,
+"conf": 1.0,
+"n": 33,
+"total": 33,
+"manual": false
+},
+"32": {
+"mcat": 34,
+"conf": 0.95,
+"n": 20,
+"total": 21,
+"manual": false
+},
+"15": {
+"mcat": 16,
+"conf": 1.0,
+"n": 54,
+"total": 54,
+"manual": false
+},
+"33": {
+"mcat": 36,
+"conf": 0.85,
+"n": 35,
+"total": 41,
+"manual": false
+},
+"13": {
+"mcat": 14,
+"conf": 0.97,
+"n": 39,
+"total": 40,
+"manual": false
+}
+}
