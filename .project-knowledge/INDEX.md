@@ -1,9 +1,9 @@
 # Shamela Linux Restoration — Knowledge Index
 
-> Last updated: 2026-08-18 (migration complete; post-migration polish)
+> Last updated: 2026-08-19 (patch shipped; user confirmation pending)
 > Status: Active
 > Stack: Python 3.7 (CPython 3.7.12) · PyInstaller-frozen · Qt widgets · Lucene 10.4 · xdis 6.0.5 / uncompyle6 3.9.0
-> Current goal: Post-migration polish (alphas, bibliography search, live-app verification)
+> Current goal: Post-migration polish (alphas, bibliography search, live-app verification) + confirm patched books-tab/background in user's real session
 
 ## What This Project Does
 

@@ -99,3 +99,14 @@ sqlite3 ~/Apps/shamela/database/master.db "SELECT id, title FROM book WHERE id =
 - The original `.mdb` files live at `Books/<shamelaID%10>/<shamelaID>.mdb` — keyed by the golden `shamelaID`, not by golden `id`
 - The golden `id`, golden `shamelaID`, and modern `book_id` are three different numbering schemes — title matching is the only way to map between them
 - Backups: `master.db.bak` is created before each migration run
+
+---
+
+<details>
+<summary>🧠 AI Context</summary>
+
+This project uses the [project-knowledge](https://github.com/YahyaZekry/claude-code-skills) skill to maintain a `.project-knowledge/` folder — a living, AI-readable map of the codebase. Every AI session loads only the files relevant to the current task instead of scanning from scratch.
+
+Built by [Yahya Zekry](https://github.com/YahyaZekry/claude-code-skills).
+
+</details>

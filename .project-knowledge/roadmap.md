@@ -5,9 +5,17 @@
 
 ## Current Goal
 
-**Migration COMPLETE.** `tools/migrate_full.py` finished: 29,276/29,278 golden books converted to the modern Linux Shamela app (2 books had zero pages, skipped). Catalog phase added 22,593 new book/author/category rows to master.db.
+**Migration COMPLETE + runtime patch SHIPPED.** `tools/migrate_full.py` finished: 29,276/29,278 golden books converted (2 had zero pages, skipped); catalog added 22,593 new book/author/category rows. Patch (background image, books-tab prefill, timing) is LIVE in the installed binary at `~/Apps/shamela/app/linux/64/bin/shamela` (tooling in `patch/`).
 
-**Next goal: post-migration polish** — alphas, bibliography search, live-app verification.
+**Next goal: post-migration polish** — alphas, bibliography search, live-app verification; plus user confirmation of the patched books-tab speedup and background swap in a real session.
+
+**Patch delivery (new, 2026-08-19):**
+- Rebuild PYZ + in-place splice into the installed binary; total size unchanged.
+- `across` gets a 12-byte prefix (`LOAD_CONST 0; LOAD_CONST None; IMPORT_NAME shamela_patch; LOAD_ATTR install; CALL_FUNCTION 0; POP_TOP` — level FIRST, fromlist second!) calling `install()` at first app import.
+- Interception = sys.modules proxy shims (frozen importer beats any meta-path finder).
+- Background lookup: `$SHAMELA_BG` → `bin/background.jpg|.png` → `~/.shamela/background.jpg|.png`.
+- Books tab: `BookCache._getCache` → batch prefill (2 queries, exact `fillBookCache` replication) + re-prefill guard.
+- Measure-only via `SHAMELA_BASELINE=1`; everything logs to `/tmp/shamela_boot.log`.
 
 **Architecture facts (validated):**
 - Golden (source): `Books/<shamelaID%10>/<shamelaID>.mdb` — Jet/Access keyed by old-official `shamelaID` (NOT golden `id`), tables `book(id,part,page,nass)` + `title(id,lvl,sub,tit)`, text **cp1256** (access_parser returns latin1-mojibake str → re-encode `latin1`→`cp1256`). Catalog: `book_index.db` `books(id,bookName,shamelaID,bookInfo,authorName,authorDeath,cat,...)`; `fields`/`fieldsBooks` empty.
