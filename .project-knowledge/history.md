@@ -1,6 +1,6 @@
 # History
 
-> Part of shamela-linux/.project-knowledge/ | Last updated: 2026-08-14
+> Part of shamela-linux/.project-knowledge/ | Last updated: 2026-08-20
 > Past-only. Append-only — never delete entries.
 
 ## Removed
@@ -19,6 +19,7 @@
 - `realResolutions_new` (customs.py) — `SETUP_LOOP`/`SETUP_EXCEPT` label collision; per-monitor DPI function rebuilt from disassembly incl. docstring → bytecode IDENTICAL *(fixed: 2026-08-14)*
 - `ReadersBrowser.keyPressEvent` (customs.py) — biggest failure; rebuilt from full disassembly incl. `wrapped=False` kwarg form (verified how 3.7 compiles `matchesShortcutEvent(event, 'Ctrl+Up', wrapped=False)`) and the `Qt.Key_F1 <= key <= Qt.Key_F35` chained comparison with its duplicated `Qt.Key_End` set member → bytecode IDENTICAL *(fixed: 2026-08-14)*
 - `tools/migrate_full.py` catalog phase wrote the golden author **name** into `book.authors` (`'محمد رشيد رضا'`, `'-'`, or empty), but the app's `fillBookCache` expects comma-separated numeric author **ids** and crashes with `ValueError: invalid literal for int()`. Result: blank, unclickable rows for all 22,598 migrated books. Fixed: `authors = str(aid)` in the tool; live data backfilled to `main_author` *(fixed: 2026-08-19)*
+- **Search freeze when searching across many/all books.** Two GUI-thread hotspots fired per result during a search: (1) `filteredBook` emitted once **per result page** → `searchFiltered` did `query.scope_list.index(book_id)` — an O(31k) linear scan per call with the migrated 31k-book library (hundreds of millions of comparisons on the UI thread for a large hit set); (2) `loadFilters` on completion ran 2 sequential SQLite queries (`bookCategory`, `bookCentury`) per distinct result book. Fixed in `shamela_patch.py`: `Query.buildScope` replaces `scope_list` with a dict-indexed list subclass (`.index()` = O(1)), and `CoreDb.bookCategory`/`bookCentury` are replaced with one batched `SELECT book_id, book_category, book_date FROM book` + per-instance dict cache. Deployed; search stays on the background thread, GUI work becomes O(1) per result *(fixed: 2026-08-20)*
 
 ---
 
@@ -35,3 +36,4 @@
 - **sys.modules shims, not meta-path finders** — PyInstaller's `PyiFrozenImporter` is first in `meta_path` and answers every frozen name, so an appended finder never fires. Proxy shims pre-registered in `sys.modules` are consulted before any finder and trigger the real frozen import on `__getattr__`. *(2026-08-19)*
 - **Everything in the patch must only log on failure** — `shamela_patch.py` is fully defensive; a patching error must degrade to the original behavior, never crash the app. *(2026-08-19)*
 - **EXE_IN/EXE_OUT hardcoded in surgery.py** — reapply after reinstall = edit the two paths at the top (or keep the app at `~/Apps/shamela`), run one command, swap `shamela.new`. *(2026-08-19)*
+- **GUI-thread search work must be O(1) per result** — the search thread is fine; the freeze was the per-result GUI work. Anything running per result page (`filteredBook` → `searchFiltered`, `loadFilters` per book) needs index/dict structures, not list scans or per-row SQLite queries. *(2026-08-20)*

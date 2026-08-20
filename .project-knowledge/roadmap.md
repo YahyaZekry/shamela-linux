@@ -1,13 +1,13 @@
 # Roadmap
 
-> Part of shamela-linux/.project-knowledge/ | Last updated: 2026-08-18
+> Part of shamela-linux/.project-knowledge/ | Last updated: 2026-08-20
 > Forward-looking only. Check this before starting any task.
 
 ## Current Goal
 
 **Migration COMPLETE + runtime patch SHIPPED.** `tools/migrate_full.py` finished: 29,276/29,278 golden books converted (2 had zero pages, skipped); catalog added 22,593 new book/author/category rows. Patch (background image, books-tab prefill, timing) is LIVE in the installed binary at `~/Apps/shamela/app/linux/64/bin/shamela` (tooling in `patch/`).
 
-**Next goal: post-migration polish** — alphas, bibliography search, live-app verification; plus user confirmation of the patched books-tab speedup and background swap in a real session.
+**Next goal: post-migration polish** — alphas, bibliography search, live-app verification; plus user confirmation of the patched books-tab speedup, background swap, and the new search-speed fix (deployed 2026-08-20, pending user test).
 
 **Patch delivery (new, 2026-08-19):**
 - Rebuild PYZ + in-place splice into the installed binary; total size unchanged.
@@ -15,6 +15,7 @@
 - Interception = sys.modules proxy shims (frozen importer beats any meta-path finder).
 - Background lookup: `$SHAMELA_BG` → `bin/background.jpg|.png` → `~/.shamela/background.jpg|.png`.
 - Books tab: `BookCache._getCache` → batch prefill (2 queries, exact `fillBookCache` replication) + re-prefill guard.
+- Search (2026-08-20): `Query.buildScope` → dict-indexed `scope_list` (`.index()` O(1)); `bookCategory`/`bookCentury` → 1 batched query + per-instance cache. Fixes GUI-thread freeze from per-result `searchFiltered` + per-book `loadFilters`.
 - Measure-only via `SHAMELA_BASELINE=1`; everything logs to `/tmp/shamela_boot.log`.
 
 **Architecture facts (validated):**
@@ -27,6 +28,7 @@
 - Title quirks: golden `title` ids repeat → renumber + remap parents; `title.page` derived by startswith-match; golden `page`/`part` columns can be NULL → `_int()` guard; part `''` single-part else `str(part)`.
 
 **Open items (next):**
+- [ ] User verification: search across many/all books no longer freezes (patch deployed 2026-08-20, app running).
 - [ ] Re-apply alphas: run app's sort (alphaBooks/alphaAuthors) or set sensible per-author alphas for the ~22k new books/authors (browse currently unsorted by author).
 - [ ] Populate bibliography/search Lucene stores (`book`/`s_book`/`author`/`s_author`) for new books via `Importer.addBook/addAuthor` (golden `bookInfo` as hint) so book/author search + betaka work.
 - [ ] Verify in the live app UI (categories tree, parts combo, TOC, page text, search).

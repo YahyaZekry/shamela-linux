@@ -46,7 +46,7 @@ def install():
 # sys.modules shims
 # ---------------------------------------------------------------------------
 
-_TARGETS = ('mainwindow', 'searchbiblio', 'dbmanager', 'cache')
+_TARGETS = ('mainwindow', 'searchbiblio', 'search_base', 'dbmanager', 'cache')
 _INFLIGHT = set()
 
 
@@ -113,6 +113,8 @@ def _patch_module(name, mod):
             _patch_mainwindow(mod)
         elif name == 'searchbiblio':
             _patch_searchbiblio(mod)
+        elif name == 'search_base':
+            _patch_search_base(mod)
         elif name == 'dbmanager':
             _patch_dbmanager(mod)
         elif name == 'cache':
@@ -220,6 +222,57 @@ def _patch_searchbiblio(mod):
     BookList._loadItems = load
 
 
+class _IndexedList(list):
+    def __init__(self, items=()):
+        super().__init__(items)
+        self._idx = {v: i for i, v in enumerate(items)}
+
+    def index(self, value, *a, **k):
+        try:
+            return self._idx[value]
+        except KeyError:
+            raise ValueError('%r is not in list' % (value,))
+
+
+def _patch_search_base(mod):
+    import sys
+    WidgetResults = mod.WidgetResults
+    engine = sys.modules.get('engine')
+
+    if engine is not None and _FIXED:
+        Query = engine.Query
+        orig_build_scope = Query.buildScope
+
+        def buildScope(self):
+            t = time.time()
+            try:
+                return orig_build_scope(self)
+            finally:
+                log('buildScope took %.3fs (%d ids)' % (
+                    time.time() - t,
+                    len(getattr(self, 'scope_list', None) or [])))
+                sl = getattr(self, 'scope_list', None)
+                if isinstance(sl, list) and not isinstance(sl, _IndexedList):
+                    self.scope_list = _IndexedList(sl)
+
+        Query.buildScope = buildScope
+        log('Query.buildScope patched (indexed scope_list)')
+
+    orig_sf = WidgetResults.searchFiltered
+
+    def searchFiltered(self, book_id):
+        t = time.time()
+        try:
+            return orig_sf(self, book_id)
+        finally:
+            dt = time.time() - t
+            if dt > 0.001:
+                log('searchFiltered(%d) took %.3fs' % (book_id, dt))
+
+    WidgetResults.searchFiltered = searchFiltered
+    log('WidgetResults.searchFiltered wrapped (timing)')
+
+
 def _patch_dbmanager(mod):
     for qname in ('getBooks', 'getBooksSet', 'getCategories'):
         orig = getattr(mod.CoreDb, qname, None)
@@ -236,6 +289,57 @@ def _patch_dbmanager(mod):
 
         setattr(mod.CoreDb, qname, wrapped)
 
+    _patch_category_lookup(mod)
+
+
+def _patch_category_lookup(mod):
+    CoreDb = mod.CoreDb
+    bc = getattr(CoreDb, 'bookCategory', None)
+    bn = getattr(CoreDb, 'bookCentury', None)
+    if not bc or not bn:
+        return
+
+    def _century(year):
+        if year < 1:
+            return 1
+        c = year / 100
+        if c != int(c):
+            c = int(c) + 1
+        return int(c)
+
+    def _cat_cache(self):
+        cache = getattr(self, '_shamela_cat_cache', None)
+        if cache is None:
+            t = time.time()
+            rows = self.cur.execute(
+                'SELECT book_id, book_category, book_date FROM book').fetchall()
+            cache = {}
+            for book_id, category, date in rows:
+                try:
+                    cache[book_id] = (category, _century(date))
+                except Exception:
+                    cache[book_id] = (category, 1)
+            self._shamela_cat_cache = cache
+            log('category/century cache built (%d books) in %.3fs' % (
+                len(cache), time.time() - t))
+        return cache
+
+    def bookCategory(self, book_id):
+        try:
+            return _cat_cache(self)[book_id][0]
+        except Exception:
+            return bc(self, book_id)
+
+    def bookCentury(self, book_id):
+        try:
+            return _cat_cache(self)[book_id][1]
+        except Exception:
+            return bn(self, book_id)
+
+    CoreDb.bookCategory = bookCategory
+    CoreDb.bookCentury = bookCentury
+    log('bookCategory/bookCentury batched')
+
 
 def _patch_cache(mod):
     BookCache = mod.BookCache
@@ -247,6 +351,7 @@ def _patch_cache(mod):
     raw = BookCache._getCache
     if hasattr(raw, '__func__'):
         raw = raw.__func__
+    BookCache._origGetCache = staticmethod(raw)  # fallback if prefill fails
 
     def get_cache(book_id):
         c = BookCache._cache
@@ -255,9 +360,11 @@ def _patch_cache(mod):
         try:
             if not _PREFILL_LOCK[0] or len(c) < 1000:
                 _prefill_book_cache()
+            if book_id in BookCache._cache:
+                return BookCache._cache[book_id]
         except Exception as e:
-            log('book cache prefill failed: %r' % e)
-        return BookCache._cache[book_id]
+            log('prefill failed, using original per-book load: %r' % e)
+        return BookCache._origGetCache(book_id)
 
     BookCache._getCache = staticmethod(get_cache)
     log('BookCache._getCache patched (batch prefill)')
@@ -270,6 +377,7 @@ def _prefill_book_cache():
     if _PREFILL_LOCK[0]:
         return False
     _PREFILL_LOCK[0] = True
+    from cache import BookCache  # noqa
     from dbmanager import CoreDb  # noqa
     from textmanager import arabize  # noqa
     from dbmanager import joinAuthors  # noqa
@@ -278,8 +386,8 @@ def _prefill_book_cache():
     book_rows = db.cur.execute(
         'SELECT book_id, book_name, book_type, printed, hidden, authors, pdf_ondisk '
         'FROM book').fetchall()
-    author_rows = dict(db.cur.execute(
-        'SELECT author_id, death_text, author_name FROM author').fetchall())
+    author_rows = {r[0]: (r[1], r[2]) for r in db.cur.execute(
+        'SELECT author_id, death_text, author_name FROM author').fetchall()}
     cache = {}
     for row in book_rows:
         book_id, book_name, book_type, printed, hidden, authors_str, pdf = row

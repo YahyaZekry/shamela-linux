@@ -1,9 +1,9 @@
 # Shamela Linux Restoration — Knowledge Index
 
-> Last updated: 2026-08-19 (patch shipped; user confirmation pending)
+> Last updated: 2026-08-20 (search-speed patch shipped; user verification pending)
 > Status: Active
 > Stack: Python 3.7 (CPython 3.7.12) · PyInstaller-frozen · Qt widgets · Lucene 10.4 · xdis 6.0.5 / uncompyle6 3.9.0
-> Current goal: Post-migration polish (alphas, bibliography search, live-app verification) + confirm patched books-tab/background in user's real session
+> Current goal: Post-migration polish (alphas, bibliography search, live-app verification) + user confirmation of patched books-tab, background, and search-speed fixes
 
 ## What This Project Does
 
